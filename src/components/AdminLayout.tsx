@@ -1,7 +1,13 @@
 import { Outlet, Link, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Package, ShoppingBag, LayoutDashboard, LogOut, Loader2 } from "lucide-react";
+import {
+  Package,
+  ShoppingBag,
+  LayoutDashboard,
+  LogOut,
+  Loader2,
+} from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -11,7 +17,7 @@ const navItems = [
 ];
 
 export default function AdminLayout() {
-  const { user, isAdmin, loading, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -22,8 +28,9 @@ export default function AdminLayout() {
     );
   }
 
-  if (!user || !isAdmin) {
-    return <Navigate to="/admin/login" replace />;
+  // ✅ Only check if user exists (vendor login allowed)
+  if (!user) {
+    return <Navigate to="/vendor/login" replace />;
   }
 
   return (
@@ -35,6 +42,7 @@ export default function AdminLayout() {
             <img src={logo} alt="BuyWithJava" className="h-8 w-auto" />
           </Link>
         </div>
+
         <nav className="flex-1 p-3 space-y-1">
           {navItems.map((item) => {
             const active = location.pathname === item.to;
@@ -42,7 +50,11 @@ export default function AdminLayout() {
               <Link key={item.to} to={item.to}>
                 <Button
                   variant="ghost"
-                  className={`w-full justify-start gap-2 ${active ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
+                  className={`w-full justify-start gap-2 ${
+                    active
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -51,9 +63,18 @@ export default function AdminLayout() {
             );
           })}
         </nav>
+
         <div className="p-3 border-t border-sidebar-border">
-          <p className="text-xs text-sidebar-foreground/60 mb-2 truncate">{user.email}</p>
-          <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-sidebar-foreground" onClick={signOut}>
+          <p className="text-xs text-sidebar-foreground/60 mb-2 truncate">
+            {user.email}
+          </p>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-2 text-sidebar-foreground"
+            onClick={signOut}
+          >
             <LogOut className="h-4 w-4" /> Sign Out
           </Button>
         </div>

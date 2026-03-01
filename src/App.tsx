@@ -19,6 +19,9 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import NotFound from "./pages/NotFound";
+import VendorPage from "./pages/VendorPage";
+import VendorLogin from "./pages/VendorLogin";
+import VendorSignup from "./pages/VendorSignup";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +42,9 @@ const App = () => (
               <Route path="/track" element={<TrackOrder />} />
               <Route path="/payment/success" element={<PaymentSuccess />} />
               <Route path="/payment/failed" element={<PaymentFailed />} />
+              <Route path="/vendor/:slug" element={<VendorPage />} />
+              <Route path="/vendor/login" element={<VendorLogin />} />
+              <Route path="/vendor/signup" element={<VendorSignup />} />
             </Route>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route element={<AdminLayout />}>
