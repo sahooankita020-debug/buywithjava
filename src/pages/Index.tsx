@@ -17,11 +17,7 @@ import { Search, Leaf, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type ExtendedProduct = Product & {
-  club_name: string;
-  store_slug: string;
-  category: string;
-  vendor_id: string;
-  category_id: string;
+  store_slug?: string;
 };
 
 export default function Index() {
@@ -30,60 +26,53 @@ export default function Index() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [groupBy, setGroupBy] = useState<"club" | "category">("club");
 
-  // ✅ PRODUCTS QUERY
-  const { data: products = [], isLoading } = useQuery<ExtendedProduct[]>({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          vendors ( id, store_name, store_slug ),
-          categories ( id, name )
-        `)
-        .eq("is_active", true)
-        .order("name");
-
-      if (error) throw error;
-
-      return (data || []).map((p: any) => ({
-        ...p,
-        vendor_id: p.vendor_id,
-        category_id: p.category_id,
-        club_name: p.vendors?.store_name || "Unknown Club",
-        store_slug: p.vendors?.store_slug || "",
-        category: p.categories?.name || "Uncategorised",
-      }));
-    },
-  });
-
-  // ✅ VENDORS
-  const { data: vendors = [] } = useQuery<any[]>({
-  queryKey: ["vendors"],
+ // ✅ PRODUCTS QUERY
+const { data: products = [], isLoading } = useQuery<ExtendedProduct[]>({
+  queryKey: ["products"],
   queryFn: async () => {
-    const { data, error } = await (supabase as any)
-      .from("vendors")
-      .select("id, store_name")
-      .order("store_name");
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true);
 
-    if (error) throw error;
-    return data || [];
+    if (error) {
+      console.error("Products query error:", error);
+      throw error;
+    }
+
+    return ((data || []) as ExtendedProduct[]);
+
   },
 });
+  // ✅ VENDORS - derived from products
+  const vendors = useMemo(() => {
+    const uniqueClubs = new Map<string, string>();
+    products.forEach((p) => {
+      if (p.club_name) {
+        uniqueClubs.set(p.club_id || p.club_name, p.club_name);
+      }
+    });
+    const arr = Array.from(uniqueClubs.entries()).map(([id, name]) => ({
+      id,
+      store_name: name,
+    }));
+    return arr;
+  }, [products]);
 
-  // ✅ CATEGORIES
-  const { data: categoriesList = [] } = useQuery<any[]>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("categories")
-        .select("id, name")
-        .order("name");
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  // ✅ CATEGORIES - derived from products
+  const categoriesList = useMemo(() => {
+    const uniqueCategories = new Map<string, string>();
+    products.forEach((p) => {
+      if (p.category) {
+        uniqueCategories.set(p.category, p.category);
+      }
+    });
+    const arr = Array.from(uniqueCategories.entries()).map(([id, name]) => ({
+      id,
+      name,
+    }));
+    return arr;
+  }, [products]);
 
   // ✅ WEEKLY SPECIALS
   const weeklySpecials = useMemo(
@@ -97,10 +86,10 @@ export default function Index() {
       if (search && !p.name.toLowerCase().includes(search.toLowerCase()))
         return false;
 
-      if (clubFilter !== "all" && p.vendor_id !== clubFilter)
+      if (clubFilter !== "all" && p.club_id !== clubFilter && p.club_name !== clubFilter)
         return false;
 
-      if (categoryFilter !== "all" && p.category_id !== categoryFilter)
+      if (categoryFilter !== "all" && p.category !== categoryFilter)
         return false;
 
       return true;
@@ -114,8 +103,8 @@ export default function Index() {
     for (const p of filtered) {
       const key =
         groupBy === "club"
-          ? p.club_name
-          : p.category || "Uncategorised";
+          ? (p.club_name || "Unknown Club")
+          : (p.category || "Uncategorised");
 
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(p);
@@ -130,6 +119,7 @@ export default function Index() {
     <div className="container py-8">
       {/* HERO */}
       <section className="mb-10 text-center">
+
         <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
           <Leaf className="h-4 w-4" />
           Cannabis delivery in Johannesburg
@@ -239,7 +229,7 @@ export default function Index() {
             <h2 className="font-display text-xl font-semibold mb-4 border-b pb-2">
               {groupBy === "club" ? (
                 <Link
-                  to={`/vendor/${items[0]?.store_slug}`}
+                  to={`/vendor/${group.replace(/\s+/g, "-").toLowerCase()}`}
                   className="hover:text-primary transition"
                 >
                   {group}

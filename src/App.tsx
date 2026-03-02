@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Layout from "@/components/Layout";
-import AdminLayout from "@/components/AdminLayout";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import Cart from "./pages/Cart";
@@ -15,14 +14,16 @@ import TrackOrder from "./pages/TrackOrder";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 import AdminLogin from "./pages/AdminLogin";
-import Dashboard from "./pages/admin/Dashboard";
-import AdminProducts from "./pages/admin/AdminProducts";
-import AdminOrders from "./pages/admin/AdminOrders";
+import VendorLayout from "./pages/vendor/VendorLayout.tsx";
+import VendorDashboard from "./pages/vendor/VendorDashboard";
+import VendorProducts from "./pages/vendor/VendorProducts";
+import VendorOrders from "./pages/vendor/VendorOrders";
 import NotFound from "./pages/NotFound";
 import VendorPage from "./pages/VendorPage";
 import VendorLogin from "./pages/VendorLogin";
 import VendorSignup from "./pages/VendorSignup";
-
+import Contact from "./pages/Contact";
+import About from "./pages/About";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -45,12 +46,14 @@ const App = () => (
               <Route path="/vendor/:slug" element={<VendorPage />} />
               <Route path="/vendor/login" element={<VendorLogin />} />
               <Route path="/vendor/signup" element={<VendorSignup />} />
+              <Route path="/about" element={<About />} />
+<Route path="/contact" element={<Contact />} />
             </Route>
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route element={<AdminLayout />}>
-              <Route path="/admin" element={<Dashboard />} />
-              <Route path="/admin/products" element={<AdminProducts />} />
-              <Route path="/admin/orders" element={<AdminOrders />} />
+            <Route element={<VendorLayout />}>
+              <Route path="/admin" element={<VendorDashboard />} />
+              <Route path="/admin/products" element={<VendorProducts />} />
+              <Route path="/admin/orders" element={<VendorOrders />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
