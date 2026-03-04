@@ -11,9 +11,9 @@ import {
 import logo from "@/assets/logo.png";
 
 const navItems = [
-  { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/admin/products", icon: Package, label: "Products" },
-  { to: "/admin/orders", icon: ShoppingBag, label: "Orders" },
+  { to: "/vendor", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/vendor/products", icon: Package, label: "Products" },
+  { to: "/vendor/orders", icon: ShoppingBag, label: "Orders" },
 ];
 
 export default function AdminLayout() {

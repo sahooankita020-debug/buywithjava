@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function VendorSignup() {
   const navigate = useNavigate();
@@ -32,19 +33,20 @@ export default function VendorSignup() {
       if (!userId) throw new Error("User not created");
 
       // 2️⃣ Insert vendor record
-      const { error: vendorError } = await (supabase as any)
+      const { error: vendorError } = await supabase
         .from("vendors")
         .insert({
+          id: userId, // ✅ VERY IMPORTANT
           store_name: storeName,
           store_slug: generateSlug(storeName),
           description,
-          user_id: userId,
+          email: email,
         });
 
       if (vendorError) throw vendorError;
 
       alert("Vendor account created successfully!");
-      navigate("/admin"); // redirect to dashboard
+      navigate("/dashboard"); // ✅ redirect to vendor dashboard
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -100,6 +102,16 @@ export default function VendorSignup() {
         >
           {loading ? "Creating..." : "Create Vendor Account"}
         </button>
+
+        <div className="text-center text-sm mt-4">
+          Already have an account?{" "}
+          <Link
+            to="/vendor/login"
+            className="text-purple-600 font-medium hover:underline"
+          >
+            Login
+          </Link>
+        </div>
       </form>
     </div>
   );

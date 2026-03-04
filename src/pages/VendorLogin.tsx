@@ -26,7 +26,7 @@ export default function VendorLogin() {
 
     if (data.user) {
       alert("Login successful!");
-      navigate("/admin");
+      navigate("/dashboard");
     }
 
     setLoading(false);
