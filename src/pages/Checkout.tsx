@@ -152,10 +152,10 @@ export default function Checkout() {
 
   <RadioGroup
   value={paymentMethod}
-  onValueChange={(v)=>setPaymentMethod(v as "ozow" | "cod")}
+  onValueChange={(v)=>setPaymentMethod(v as  "cod")}
   className="space-y-3"
   >
-
+{/*
   <div className="flex items-center space-x-3 border rounded-lg p-4">
 
   <RadioGroupItem value="ozow" id="ozow"/>
@@ -165,7 +165,7 @@ export default function Checkout() {
   </Label>
 
   </div>
-
+*/}
   <div className="flex items-center space-x-3 border rounded-lg p-4">
 
   <RadioGroupItem value="cod" id="cod"/>
