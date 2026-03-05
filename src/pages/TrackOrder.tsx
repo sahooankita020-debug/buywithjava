@@ -2,91 +2,95 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card,CardContent } from "@/components/ui/card";
 
-export default function TrackOrder() {
+export default function TrackOrder(){
 
-  const [orderId,setOrderId] = useState("");
-  const [order,setOrder] = useState<any>(null);
-  const [error,setError] = useState("");
+const [orderId,setOrderId] = useState("")
+const [order,setOrder] = useState<any>(null)
+const [error,setError] = useState("")
 
-  const searchOrder = async()=>{
+const searchOrder = async()=>{
 
-    setError("");
+setError("")
 
-    const { data } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("order_number",orderId)
-      .single();
+const {data} = await supabase
+.from("orders")
+.select("*")
+.eq("order_number",orderId)
+.single()
 
-    if(!data){
-      setError("Order not found");
-      return;
-    }
+if(!data){
+setError("Order not found")
+return
+}
 
-    setOrder(data);
+setOrder(data)
 
-  };
+}
 
-  return (
+return(
 
-    <div className="container py-10 max-w-xl">
+<div className="container py-10 max-w-xl">
 
-      <h1 className="text-3xl font-bold text-center mb-6">
-        Track Order
-      </h1>
+<h1 className="text-3xl font-bold text-center mb-6">
+Track Order
+</h1>
 
-      <div className="flex gap-2 mb-6">
+<div className="flex gap-2 mb-6">
 
-        <Input
-          placeholder="Enter Order ID"
-          value={orderId}
-          onChange={(e)=>setOrderId(e.target.value)}
-        />
+<Input
+placeholder="Enter Order ID"
+value={orderId}
+onChange={(e)=>setOrderId(e.target.value)}
+/>
 
-        <Button onClick={searchOrder}>
-          Track
-        </Button>
+<Button onClick={searchOrder}>
+Track
+</Button>
 
-      </div>
+</div>
 
-      {error && (
-        <p className="text-red-500 text-center">
-          {error}
-        </p>
-      )}
+{error &&(
+<p className="text-red-500 text-center">
+{error}
+</p>
+)}
 
-      {order && (
+{order &&(
 
-        <Card>
+<Card>
 
-          <CardContent className="space-y-3 p-6">
+<CardContent className="space-y-3 p-6">
 
-            <div>
-              <b>Status:</b> {order.delivery_status}
-            </div>
+<div>
+<b>Status:</b> {order.delivery_status}
+</div>
 
-            <div>
-              <b>Name:</b> {order.customer_name}
-            </div>
+<div>
+<b>Payment:</b> {order.payment_method === "ozow" ? "Instant EFT (Ozow)" : "Cash On Delivery"}
+</div>
 
-            <div>
-              <b>Phone:</b> {order.customer_phone}
-            </div>
+<div>
+<b>Name:</b> {order.customer_name}
+</div>
 
-            <div>
-              <b>Address:</b> {order.delivery_address}
-            </div>
+<div>
+<b>Phone:</b> {order.customer_phone}
+</div>
 
-          </CardContent>
+<div>
+<b>Address:</b> {order.delivery_address}
+</div>
 
-        </Card>
+</CardContent>
 
-      )}
+</Card>
 
-    </div>
+)}
 
-  );
+</div>
+
+)
 
 }

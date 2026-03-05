@@ -1,163 +1,173 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams,Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card,CardContent,CardHeader,CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Copy } from "lucide-react";
+import { CheckCircle,Copy } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-interface Order {
-  id: string;
-  order_number: string;
-  customer_name: string;
-  customer_phone: string;
-  delivery_address: string;
-  items: any;
-  total_amount: number;
-  delivery_status: string;
+interface Order{
+id:string
+order_number:string
+customer_name:string
+customer_phone:string
+delivery_address:string
+items:any
+total_amount:number
+delivery_status:string
+payment_method:string
 }
 
-export default function OrderConfirmation() {
+export default function OrderConfirmation(){
 
-  const { id } = useParams();
+const {id} = useParams()
 
-  const { data: order } = useQuery<Order>({
-    queryKey: ["order", id],
-    queryFn: async () => {
+const {data:order} = useQuery<Order>({
+queryKey:["order",id],
+queryFn:async()=>{
 
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*")
-        .eq("id", id!)
-        .single();
+const {data,error} = await supabase
+.from("orders")
+.select("*")
+.eq("id",id!)
+.single()
 
-      if (error) throw error;
+if(error) throw error
 
-      return data as Order;
-    },
-    enabled: !!id
-  });
+return data as unknown as Order
 
-  if (!order) return null;
+},
+enabled:!!id
+})
 
-  const items = order.items || [];
+if(!order) return null
 
-  const copyOrder = () => {
+const items = order.items || []
 
-    navigator.clipboard.writeText(order.order_number);
+const copyOrder=()=>{
 
-    toast({
-      title: "Order ID copied"
-    });
+navigator.clipboard.writeText(order.order_number)
 
-  };
+toast({
+title:"Order ID copied"
+})
 
-  return (
+}
 
-    <div className="container py-8 max-w-2xl">
+return(
 
-      <div className="text-center mb-8">
+<div className="container py-8 max-w-2xl">
 
-        <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+<div className="text-center mb-8">
 
-        <h1 className="text-3xl font-bold">
-          Order Confirmed!
-        </h1>
+<CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4"/>
 
-        <p className="text-muted-foreground">
-          Save your Order ID to track your order
-        </p>
+<h1 className="text-3xl font-bold">
+Order Confirmed!
+</h1>
 
-      </div>
+<p className="text-muted-foreground">
+Save your Order ID to track your order
+</p>
 
-      <Card>
+</div>
 
-        <CardHeader>
+<Card>
 
-          <CardTitle className="flex justify-between">
+<CardHeader>
 
-            <span>Order ID</span>
+<CardTitle className="flex justify-between">
 
-            <Badge>{order.delivery_status}</Badge>
+<span>Order ID</span>
 
-          </CardTitle>
+<Badge>{order.delivery_status}</Badge>
 
-        </CardHeader>
+</CardTitle>
 
-        <CardContent className="space-y-4">
+</CardHeader>
 
-          <div className="flex items-center justify-between">
+<CardContent className="space-y-4">
 
-            <span className="font-mono text-lg">
-              {order.order_number}
-            </span>
+<div className="flex items-center justify-between">
 
-            <Button size="sm" onClick={copyOrder}>
-              <Copy className="h-4 w-4 mr-1"/>
-              Copy
-            </Button>
+<span className="font-mono text-lg">
+{order.order_number}
+</span>
 
-          </div>
+<Button size="sm" onClick={copyOrder}>
+<Copy className="h-4 w-4 mr-1"/>
+Copy
+</Button>
 
-          <div>
-            <b>Name:</b> {order.customer_name}
-          </div>
+</div>
 
-          <div>
-            <b>Phone:</b> {order.customer_phone}
-          </div>
+<div>
+<b>Name:</b> {order.customer_name}
+</div>
 
-          <div>
-            <b>Address:</b> {order.delivery_address}
-          </div>
+<div>
+<b>Phone:</b> {order.customer_phone}
+</div>
 
-          <div className="border-t pt-3">
+<div>
+<b>Address:</b> {order.delivery_address}
+</div>
 
-            {items.map((item:any,i:number)=>(
-              <div key={i} className="flex justify-between py-1">
+<div>
+<b>Payment:</b> {order.payment_method === "ozow" ? "Instant EFT (Ozow)" : "Cash On Delivery"}
+</div>
 
-                <span>
-                  {item.productName} × {item.quantity}
-                </span>
+<div className="border-t pt-3">
 
-                <span>
-                  R{(item.price * item.quantity).toFixed(2)}
-                </span>
+{items.map((item:any,i:number)=>(
+<div key={i} className="flex justify-between py-1">
 
-              </div>
-            ))}
+<span>
+{item.productName} × {item.quantity}
+</span>
 
-            <div className="flex justify-between pt-3 font-bold border-t">
+<span>
+R{(item.price*item.quantity).toFixed(2)}
+</span>
 
-              <span>Total</span>
+</div>
+))}
 
-              <span>
-                R{order.total_amount.toFixed(2)}
-              </span>
+<div className="flex justify-between pt-3 font-bold border-t">
 
-            </div>
+<span>Total</span>
 
-          </div>
+<span>
+R{order.total_amount.toFixed(2)}
+</span>
 
-        </CardContent>
+</div>
 
-      </Card>
+</div>
 
-      <div className="flex gap-3 justify-center mt-6">
+</CardContent>
 
-        <Link to="/">
-          <Button variant="outline">Back to Menu</Button>
-        </Link>
+</Card>
 
-        <Link to="/track">
-          <Button>Track Order</Button>
-        </Link>
+<div className="flex gap-3 justify-center mt-6">
 
-      </div>
+<Link to="/">
+<Button variant="outline">
+Back to Menu
+</Button>
+</Link>
 
-    </div>
+<Link to="/track">
+<Button>
+Track Order
+</Button>
+</Link>
 
-  );
+</div>
+
+</div>
+
+)
 
 }
